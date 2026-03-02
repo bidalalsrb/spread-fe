@@ -1,0 +1,15 @@
+{
+  "name": "spread-input",
+  "short_name": "spread-input",
+  "display": "standalone",
+  "start_url": "/",
+  "background_color": "#f6f8fb",
+  "theme_color": "#0f6fff",
+  "icons": [
+    {
+      "src": "/vite.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
