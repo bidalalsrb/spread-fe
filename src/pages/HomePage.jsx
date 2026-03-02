@@ -1,7 +1,10 @@
-import React from 'react';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiFetch } from '../api';
+import { Button } from '../components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
+import { Textarea } from '../components/ui/textarea';
 
 export default function HomePage() {
   const [students, setStudents] = useState([]);
@@ -62,36 +65,52 @@ export default function HomePage() {
   };
 
   return (
-    <div className="card">
-      <h1>메모 입력</h1>
-      <form onSubmit={handleSave} className="form">
-        <label className="label">학생명</label>
-        {students.length === 0 ? (
-          <p className="hint">설정에서 학생을 추가하세요.</p>
-        ) : (
-          <select className="input" value={studentName} onChange={(e) => setStudentName(e.target.value)}>
-            {students.map((student) => (
-              <option key={student.id} value={student.name}>
-                {student.name}
-              </option>
-            ))}
-          </select>
-        )}
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-2xl">메모 입력</CardTitle>
+        <CardDescription>학생을 선택하고 내용을 저장하세요.</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSave} className="space-y-4">
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-muted-foreground">학생명</label>
+            {students.length === 0 ? (
+              <p className="rounded-md border border-dashed border-border bg-muted px-3 py-2 text-sm text-muted-foreground">
+                설정에서 학생을 추가하세요.
+              </p>
+            ) : (
+              <Select value={studentName} onValueChange={setStudentName}>
+                <SelectTrigger>
+                  <SelectValue placeholder="학생 선택" />
+                </SelectTrigger>
+                <SelectContent>
+                  {students.map((student) => (
+                    <SelectItem key={student.id} value={student.name}>
+                      {student.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          </div>
 
-        <label className="label">내용</label>
-        <textarea
-          className="input textarea"
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          maxLength={2000}
-          placeholder="내용 입력"
-        />
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-muted-foreground">내용</label>
+            <Textarea
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              maxLength={2000}
+              placeholder="내용 입력"
+            />
+          </div>
 
-        <button className="btn" type="submit" disabled={loading || students.length === 0}>
-          {loading ? '저장 중...' : '저장'}
-        </button>
-      </form>
-      {message ? <p className="hint">{message}</p> : null}
-    </div>
+          <Button className="w-full" type="submit" disabled={loading || students.length === 0}>
+            {loading ? '저장 중...' : '저장'}
+          </Button>
+
+          {message ? <p className="text-sm text-muted-foreground">{message}</p> : null}
+        </form>
+      </CardContent>
+    </Card>
   );
 }

@@ -1,13 +1,15 @@
-import React from 'react';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Trash2 } from 'lucide-react';
 import { apiFetch } from '../api';
+import { Button } from '../components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { Input } from '../components/ui/input';
 
 export default function SettingsPage() {
   const [students, setStudents] = useState([]);
   const [newStudent, setNewStudent] = useState('');
   const [spreadsheetId, setSpreadsheetId] = useState('');
-  const [sheetName, setSheetName] = useState('메모기록');
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
 
@@ -25,7 +27,6 @@ export default function SettingsPage() {
       ]);
       setStudents(studentRes.items || []);
       setSpreadsheetId(settingsRes.spreadsheetId || '');
-      setSheetName(settingsRes.sheetName || '메모기록');
     } catch (err) {
       setMessage(err.message);
     }
@@ -59,91 +60,64 @@ export default function SettingsPage() {
     }
   };
 
-  const saveSettings = async () => {
-    try {
-      await persistSettings();
-      setMessage('설정 저장 완료');
-      await loadAll();
-    } catch (err) {
-      setMessage(err.message);
-    }
-  };
-
-  const persistSettings = async () => {
-    await apiFetch(
-      '/api/settings',
-      {
-        method: 'PUT',
-        body: JSON.stringify({ spreadsheetId, sheetName })
-      },
-      onUnauthorized
-    );
-  };
-
   const testConnection = async () => {
     try {
-      await persistSettings();
       await apiFetch('/api/settings/test', { method: 'POST' }, onUnauthorized);
       setMessage('시트 연결 성공');
-      await loadAll();
     } catch (err) {
       setMessage(`연결 실패: ${err.message}`);
     }
   };
 
   return (
-    <div className="card">
-      <h1>설정</h1>
+    <div className="space-y-4">
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">학생 목록 관리</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="flex gap-2">
+            <Input
+              value={newStudent}
+              onChange={(e) => setNewStudent(e.target.value)}
+              placeholder="학생 이름"
+              className="flex-1"
+            />
+            <Button type="button" onClick={addStudent}>
+              추가
+            </Button>
+          </div>
 
-      <section className="section">
-        <h2>학생 목록 관리</h2>
-        <div className="row">
-          <input
-            className="input"
-            value={newStudent}
-            onChange={(e) => setNewStudent(e.target.value)}
-            placeholder="학생 이름"
-          />
-          <button type="button" className="btn small" onClick={addStudent}>
-            추가
-          </button>
-        </div>
-        <ul className="list">
-          {students.map((s) => (
-            <li key={s.id} className="list-item">
-              <span>{s.name}</span>
-              <button type="button" className="danger" onClick={() => deleteStudent(s.id)}>
-                삭제
-              </button>
-            </li>
-          ))}
-        </ul>
-      </section>
+          <ul className="divide-y rounded-md border bg-card">
+            {students.map((s) => (
+              <li key={s.id} className="flex items-center justify-between px-3 py-2">
+                <span className="text-sm font-medium">{s.name}</span>
+                <Button type="button" variant="destructive" size="sm" onClick={() => deleteStudent(s.id)}>
+                  <Trash2 className="mr-1 h-3.5 w-3.5" /> 삭제
+                </Button>
+              </li>
+            ))}
+            {students.length === 0 ? (
+              <li className="px-3 py-3 text-sm text-muted-foreground">등록된 학생이 없습니다.</li>
+            ) : null}
+          </ul>
+        </CardContent>
+      </Card>
 
-      <section className="section">
-        <h2>스프레드시트 설정</h2>
-        <label className="label">Spreadsheet URL 또는 ID</label>
-        <input
-          className="input"
-          value={spreadsheetId}
-          onChange={(e) => setSpreadsheetId(e.target.value)}
-          placeholder="https://docs.google.com/spreadsheets/..."
-        />
-        <label className="label">Sheet 탭 이름</label>
-        <input className="input" value={sheetName} onChange={(e) => setSheetName(e.target.value)} />
-        <button type="button" className="btn" onClick={saveSettings}>
-          저장
-        </button>
-      </section>
-
-      <section className="section">
-        <h2>연결 테스트</h2>
-        <button type="button" className="btn" onClick={testConnection}>
-          시트 연결 테스트
-        </button>
-      </section>
-
-      {message ? <p className="hint">{message}</p> : null}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">스프레드시트 연결 테스트</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <p className="rounded-md border bg-muted px-3 py-2 text-sm text-muted-foreground break-all">
+            고정 주소: {spreadsheetId || '설정되지 않음'}
+          </p>
+          <Button type="button" onClick={testConnection} className="w-full">
+            시트 연결 테스트
+          </Button>
+          {message ? <p className="text-sm text-muted-foreground">{message}</p> : null}
+        </CardContent>
+      </Card>
     </div>
   );
 }
