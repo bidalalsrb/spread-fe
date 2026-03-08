@@ -674,8 +674,8 @@ video {
           user-select: none;
 }
 
-.grid-cols-\[1fr_1fr_auto\] {
-  grid-template-columns: 1fr 1fr auto;
+.grid-cols-\[1fr_1fr_1fr_auto\] {
+  grid-template-columns: 1fr 1fr 1fr auto;
 }
 
 .flex-col {

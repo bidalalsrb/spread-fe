@@ -3,6 +3,7 @@ import { Navigate, NavLink, Route, Routes, useNavigate } from 'react-router-dom'
 import { clearToken, getToken } from './auth';
 import { Button } from './components/ui/button';
 import { cn } from './lib/utils';
+import AbsencePage from './pages/AbsencePage';
 import AuthPage from './pages/AuthPage';
 import HomePage from './pages/HomePage';
 import SettingsPage from './pages/SettingsPage';
@@ -43,8 +44,9 @@ function Layout({ children }) {
     <div className="mx-auto min-h-screen w-full max-w-2xl px-4 pb-24 pt-5">
       <main>{children}</main>
       <footer className="fixed inset-x-0 bottom-0 mx-auto w-full max-w-2xl border-t bg-background/90 px-4 pb-[calc(0.65rem+env(safe-area-inset-bottom))] pt-3 backdrop-blur">
-        <div className="grid grid-cols-[1fr_1fr_auto] gap-2">
+        <div className="grid grid-cols-[1fr_1fr_1fr_auto] gap-2">
           <TabLink to="/">홈</TabLink>
+          <TabLink to="/absence">결석</TabLink>
           <TabLink to="/settings">설정</TabLink>
           <Button variant="ghost" onClick={handleLogout} className="h-11 px-3 text-xs sm:text-sm">
             로그아웃
@@ -65,6 +67,16 @@ export default function App() {
           <ProtectedRoute>
             <Layout>
               <HomePage />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/absence"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <AbsencePage />
             </Layout>
           </ProtectedRoute>
         }
