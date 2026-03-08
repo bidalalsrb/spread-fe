@@ -48,9 +48,9 @@ function Layout({ children }) {
           <TabLink to="/">홈</TabLink>
           <TabLink to="/absence">결석</TabLink>
           <TabLink to="/settings">설정</TabLink>
-          <Button variant="ghost" onClick={handleLogout} className="h-11 px-3 text-xs sm:text-sm">
-            로그아웃
-          </Button>
+          {/*<Button variant="ghost" onClick={handleLogout} className="h-11 px-3 text-xs sm:text-sm">*/}
+          {/*  로그아웃*/}
+          {/*</Button>*/}
         </div>
       </footer>
     </div>
