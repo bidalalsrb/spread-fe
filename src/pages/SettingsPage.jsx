@@ -4,6 +4,15 @@ import { Trash2 } from 'lucide-react';
 import { apiFetch } from '../api';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogOverlay,
+  DialogTitle
+} from '../components/ui/dialog';
 import { Input } from '../components/ui/input';
 
 export default function SettingsPage() {
@@ -165,24 +174,26 @@ export default function SettingsPage() {
         </CardContent>
       </Card>
 
-      {editStudentId ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-          <div className="w-full max-w-sm rounded-lg border bg-background p-4 shadow-lg">
-            <h3 className="text-base font-semibold">학생 이름 수정</h3>
-            <div className="mt-3 space-y-3">
-              <Input value={editStudentName} onChange={(e) => setEditStudentName(e.target.value)} placeholder="학생 이름" />
-              <div className="flex justify-end gap-2">
-                <Button type="button" variant="ghost" onClick={closeEditModal} disabled={editing}>
-                  취소
-                </Button>
-                <Button type="button" onClick={updateStudent} disabled={editing}>
-                  {editing ? '저장 중...' : '저장'}
-                </Button>
-              </div>
-            </div>
+      <Dialog open={Boolean(editStudentId)}>
+        <DialogOverlay onClick={() => closeEditModal()} />
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>학생 이름 수정</DialogTitle>
+            <DialogDescription>변경할 이름을 입력하고 저장하세요.</DialogDescription>
+          </DialogHeader>
+          <div className="mt-4">
+            <Input value={editStudentName} onChange={(e) => setEditStudentName(e.target.value)} placeholder="학생 이름" />
           </div>
-        </div>
-      ) : null}
+          <DialogFooter className="mt-4">
+            <Button type="button" variant="ghost" onClick={() => closeEditModal()} disabled={editing}>
+              취소
+            </Button>
+            <Button type="button" onClick={updateStudent} disabled={editing}>
+              {editing ? '저장 중...' : '저장'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
