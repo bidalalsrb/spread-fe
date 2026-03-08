@@ -9,6 +9,9 @@ import { Input } from '../components/ui/input';
 export default function SettingsPage() {
   const [students, setStudents] = useState([]);
   const [newStudent, setNewStudent] = useState('');
+  const [editStudentId, setEditStudentId] = useState(null);
+  const [editStudentName, setEditStudentName] = useState('');
+  const [editing, setEditing] = useState(false);
   const [spreadsheetId, setSpreadsheetId] = useState('');
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
@@ -60,6 +63,44 @@ export default function SettingsPage() {
     }
   };
 
+  const openEditModal = (student) => {
+    setEditStudentId(student.id);
+    setEditStudentName(student.name);
+  };
+
+  const closeEditModal = (force = false) => {
+    if (editing && !force) {
+      return;
+    }
+    setEditStudentId(null);
+    setEditStudentName('');
+  };
+
+  const updateStudent = async () => {
+    if (!editStudentId) {
+      return;
+    }
+    if (!editStudentName.trim()) {
+      setMessage('학생 이름을 입력하세요.');
+      return;
+    }
+    try {
+      setEditing(true);
+      await apiFetch(
+        `/api/students/${editStudentId}`,
+        { method: 'PUT', body: JSON.stringify({ name: editStudentName }) },
+        onUnauthorized
+      );
+      setMessage('학생 이름 수정 완료');
+      closeEditModal(true);
+      loadAll();
+    } catch (err) {
+      setMessage(err.message);
+    } finally {
+      setEditing(false);
+    }
+  };
+
   const testConnection = async () => {
     try {
       await apiFetch('/api/settings/test', { method: 'POST' }, onUnauthorized);
@@ -92,9 +133,14 @@ export default function SettingsPage() {
             {students.map((s) => (
               <li key={s.id} className="flex items-center justify-between px-3 py-2">
                 <span className="text-sm font-medium">{s.name}</span>
-                <Button type="button" variant="destructive" size="sm" onClick={() => deleteStudent(s.id)}>
-                  <Trash2 className="mr-1 h-3.5 w-3.5" /> 삭제
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button type="button" variant="secondary" size="sm" onClick={() => openEditModal(s)}>
+                    수정
+                  </Button>
+                  <Button type="button" variant="destructive" size="sm" onClick={() => deleteStudent(s.id)}>
+                    <Trash2 className="mr-1 h-3.5 w-3.5" /> 삭제
+                  </Button>
+                </div>
               </li>
             ))}
             {students.length === 0 ? (
@@ -118,6 +164,25 @@ export default function SettingsPage() {
           {message ? <p className="text-sm text-muted-foreground">{message}</p> : null}
         </CardContent>
       </Card>
+
+      {editStudentId ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+          <div className="w-full max-w-sm rounded-lg border bg-background p-4 shadow-lg">
+            <h3 className="text-base font-semibold">학생 이름 수정</h3>
+            <div className="mt-3 space-y-3">
+              <Input value={editStudentName} onChange={(e) => setEditStudentName(e.target.value)} placeholder="학생 이름" />
+              <div className="flex justify-end gap-2">
+                <Button type="button" variant="ghost" onClick={closeEditModal} disabled={editing}>
+                  취소
+                </Button>
+                <Button type="button" onClick={updateStudent} disabled={editing}>
+                  {editing ? '저장 중...' : '저장'}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
