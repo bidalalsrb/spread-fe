@@ -1,6 +1,11 @@
 import { clearToken, getToken } from './auth';
 
-const API_BASE = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
+const runtimeHost = typeof window !== 'undefined' ? window.location.hostname : '';
+const defaultBase =
+  runtimeHost === 'localhost' || runtimeHost === '127.0.0.1'
+    ? 'http://localhost:8080'
+    : '';
+const API_BASE = (import.meta.env.VITE_API_BASE_URL || defaultBase).replace(/\/$/, '');
 
 export async function apiFetch(path, options = {}, onUnauthorized) {
   const headers = {
