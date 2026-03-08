@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Navigate, NavLink, Route, Routes, useNavigate } from 'react-router-dom';
 import { clearToken, getToken } from './auth';
+import { API_LOADING_EVENT } from './api';
 import { Button } from './components/ui/button';
 import { cn } from './lib/utils';
 import AbsencePage from './pages/AbsencePage';
@@ -34,6 +35,17 @@ function TabLink({ to, children }) {
 
 function Layout({ children }) {
   const navigate = useNavigate();
+  const [showSpinner, setShowSpinner] = useState(false);
+
+  useEffect(() => {
+    const handleLoading = (event) => {
+      setShowSpinner(event.detail?.pending > 0);
+    };
+    window.addEventListener(API_LOADING_EVENT, handleLoading);
+    return () => {
+      window.removeEventListener(API_LOADING_EVENT, handleLoading);
+    };
+  }, []);
 
   const handleLogout = () => {
     clearToken();
@@ -42,6 +54,11 @@ function Layout({ children }) {
 
   return (
     <div className="mx-auto min-h-screen w-full max-w-2xl px-4 pb-24 pt-5">
+      {showSpinner ? (
+        <div className="fixed inset-0 z-[70] flex items-center justify-center bg-background/40 backdrop-blur-[1px]">
+          <div className="h-12 w-12 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
+        </div>
+      ) : null}
       <main>{children}</main>
       <footer className="fixed inset-x-0 bottom-0 mx-auto w-full max-w-2xl border-t bg-background/90 px-4 pb-[calc(0.65rem+env(safe-area-inset-bottom))] pt-3 backdrop-blur">
         <div className="grid grid-cols-[1fr_1fr_1fr_auto] gap-2">
