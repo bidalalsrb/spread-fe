@@ -624,6 +624,10 @@ video {
   height: 2.25rem;
 }
 
+.max-h-\[22\.5rem\] {
+  max-height: 22.5rem;
+}
+
 .min-h-\[140px\] {
   min-height: 140px;
 }
@@ -726,6 +730,10 @@ video {
 
 .overflow-hidden {
   overflow: hidden;
+}
+
+.overflow-y-auto {
+  overflow-y: auto;
 }
 
 .whitespace-nowrap {
