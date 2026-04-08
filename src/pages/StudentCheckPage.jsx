@@ -60,7 +60,7 @@ export default function StudentCheckPage() {
   const toggleChecked = (studentName) => {
     setCheckedMap((prev) => ({
       ...prev,
-      [studentName]: true
+      [studentName]: !prev[studentName]
     }));
   };
 
